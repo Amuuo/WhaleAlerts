@@ -8,30 +8,8 @@
 
 <h3>WhaleTransactions</h3>
 
+<MudButton ButtonType="ButtonType.Submit" OnClick="RefreshTransactions" >Testing</MudButton>
 
-
-<MudTable Items="@transactionList.Transactions" HeaderClass="my-table">
-	<HeaderContent>		
-		<MudTh>Symbol</MudTh>
-		<MudTh>Amount</MudTh>
-		<MudTh>Amount_USD</MudTh>
-		<MudTh>Blockchain</MudTh>
-		<MudTh>From</MudTh>
-		<MudTh>To</MudTh>
-		<MudTh>Timestamp</MudTh>				
-	</HeaderContent>
-	<RowTemplate>
-		<MudTd Class="clm-row-small" DataLabel="Symbol">@context.Symbol</MudTd>
-		<MudTd Class="clm-row-small" DataLabel="Amount">@context.Amount</MudTd>
-		<MudTd Class="clm-row-small" DataLabel="Amount_USD">@context.Amount_USD</MudTd>
-		<MudTd Class="clm-row-small" DataLabel="Blockchain">@context.Blockchain</MudTd>		
-		<MudTd Class="clm-row-small" DataLabel="From">@context.From.Owner</MudTd>
-		<MudTd Class="clm-row-small" DataLabel="To">@context.To.Owner_Type</MudTd>
-		<MudTd Class="clm-row-small" DataLabel="Timestamp">@GetDateTime(@context.Timestamp)</MudTd>
-	</RowTemplate>
-</MudTable>
-
-<!--
 <table class="table table-striped table-hover">
 	<thead>		
 		<tr class="d-table-row">
@@ -46,7 +24,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach(var transaction in GetWhaleTransactions().Transactions)
+		@foreach(var transaction in transactionList.Transactions)
 		{
 			<tr class="d-sm-table-row">
 					
@@ -78,20 +56,26 @@
 		}
 	</tbody>
 </table>
--->
+
 
 @code {
 
 	private string ApiKey = "BMEJgT0Gb3URK2b8pWAbu3cWN1x8jZpr";
 	private string ApiUrl = "https://api.whale-alert.io/v1/transactions";
 	private TransactionList transactionList { get; set; }
-
-	public WhaleTransactionController whaleTransactionController { get; set; } = new WhaleTransactionController();
+	
 
 	protected override async Task OnInitializedAsync()
 	{
 		transactionList = await GetWhaleTransactions();
 	}
+
+
+	private async Task RefreshTransactions()
+	{
+		transactionList = await GetWhaleTransactions();			
+	}
+
 
 	public async Task<TransactionList> GetWhaleTransactions()
 	{
@@ -110,6 +94,7 @@
 
 		//var test = JsonConvert.DeserializeObject(json);            
 	}
+
 
 	public DateTime GetDateTime(int epoch) {
 		DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(epoch);

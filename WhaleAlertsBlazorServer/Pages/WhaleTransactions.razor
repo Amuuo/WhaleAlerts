@@ -1,0 +1,119 @@
+﻿@page "/whaletransactions"
+
+@using MudBlazor;
+@using WhaleAlertsLibrary.Controllers
+@using WhaleAlertsLibrary.Models
+@using System.Text.Json
+
+
+<h3>WhaleTransactions</h3>
+
+
+
+<MudTable Items="@transactionList.Transactions" HeaderClass="my-table">
+	<HeaderContent>		
+		<MudTh>Symbol</MudTh>
+		<MudTh>Amount</MudTh>
+		<MudTh>Amount_USD</MudTh>
+		<MudTh>Blockchain</MudTh>
+		<MudTh>From</MudTh>
+		<MudTh>To</MudTh>
+		<MudTh>Timestamp</MudTh>				
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd Class="clm-row-small" DataLabel="Symbol">@context.Symbol</MudTd>
+		<MudTd Class="clm-row-small" DataLabel="Amount">@context.Amount</MudTd>
+		<MudTd Class="clm-row-small" DataLabel="Amount_USD">@context.Amount_USD</MudTd>
+		<MudTd Class="clm-row-small" DataLabel="Blockchain">@context.Blockchain</MudTd>		
+		<MudTd Class="clm-row-small" DataLabel="From">@context.From.Owner</MudTd>
+		<MudTd Class="clm-row-small" DataLabel="To">@context.To.Owner_Type</MudTd>
+		<MudTd Class="clm-row-small" DataLabel="Timestamp">@GetDateTime(@context.Timestamp)</MudTd>
+	</RowTemplate>
+</MudTable>
+
+<!--
+<table class="table table-striped table-hover">
+	<thead>		
+		<tr class="d-table-row">
+			<td>Symbol</td>
+			<td>Amount</td>
+			<td>Amount_USD</td>
+			<td>Blockchain</td>
+			<td>From</td>	
+			<td><span class="oi oi-arrow-right" aria-hidden="true"></span></td>
+			<td>To</td>			
+			<td>Timestamp</td>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var transaction in GetWhaleTransactions().Transactions)
+		{
+			<tr class="d-sm-table-row">
+					
+				<td>@transaction.Symbol.ToUpper()</td>
+				<td>@transaction.Amount</td>
+				<td><span class="dollars">@transaction.Amount_USD</span></td>
+				<td>@transaction.Blockchain</td>
+				@if(@transaction.From.Owner_Type == "exchange")
+				{
+					<td>@transaction.From.Owner</td>
+				}
+				else
+				{					
+					<td>@transaction.From.Owner_Type</td>				
+				}
+				<td><span class="oi oi-arrow-right" aria-hidden="true"></span></td>
+				
+				@if (@transaction.To.Owner_Type == "exchange")
+				{
+					<td>@transaction.To.Owner</td>
+				}
+				else
+				{
+					<td>@transaction.To.Owner_Type</td>
+				}
+				
+				<td>@GetDateTime(@transaction.Timestamp)</td>
+			</tr>
+		}
+	</tbody>
+</table>
+-->
+
+@code {
+
+	private string ApiKey = "BMEJgT0Gb3URK2b8pWAbu3cWN1x8jZpr";
+	private string ApiUrl = "https://api.whale-alert.io/v1/transactions";
+	private TransactionList transactionList { get; set; }
+
+	public WhaleTransactionController whaleTransactionController { get; set; } = new WhaleTransactionController();
+
+	protected override async Task OnInitializedAsync()
+	{
+		transactionList = await GetWhaleTransactions();
+	}
+
+	public async Task<TransactionList> GetWhaleTransactions()
+	{
+		var httpClient = new HttpClient();
+
+		httpClient.BaseAddress = new Uri(ApiUrl);
+		var request = new System.Net.Http.HttpRequestMessage();
+		request.Headers.Add("X-WA-API-KEY", ApiKey);
+		//request.Headers.Add("Access-Control-Allow-Origin", "*");
+		var response = httpClient.SendAsync(request);
+
+		var json = new StreamReader(response.Result.Content.ReadAsStreamAsync().Result).BaseStream;
+
+
+		return await JsonSerializer.DeserializeAsync<TransactionList>(json, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+		//var test = JsonConvert.DeserializeObject(json);            
+	}
+
+	public DateTime GetDateTime(int epoch) {
+		DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(epoch);
+		
+		return dateTimeOffset.LocalDateTime;
+	}
+}

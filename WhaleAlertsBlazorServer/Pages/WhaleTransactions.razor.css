@@ -1,0 +1,17 @@
+﻿
+
+.my-table {
+    width:100%;
+}
+
+.from_exchange {
+    background-color: forestgreen;
+}
+
+.to_exchange {
+    background-color: red;
+}
+
+.between_exchange {
+    background-color: grey;
+}

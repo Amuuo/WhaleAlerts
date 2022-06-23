@@ -1,0 +1,69 @@
+﻿@page "/whaletransactions"
+@inject HttpClient httpClient
+
+@using WhaleAlertsLibrary.Controllers
+@using WhaleAlertsLibrary.Models
+@using System.Text.Json
+
+<h3>WhaleTransactions</h3>
+
+<table>
+	<thead>		
+		<tr>
+			<td>Amount</td>
+			<td>Amount_USD</td>
+			<td>Blockchain</td>
+			<td>From</td>
+			<td>Hash</td>
+			<td>Symbol</td>
+			<td>Timestamp</td>
+			<td>To</td>
+			<td>Transaction_Count</td>
+			<td>Transaction_Type</td>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var transaction in GetWhaleTransactions().Transactions)
+		{
+			<tr>
+				<td>@transaction.Amount</td>
+				<td>@transaction.Amount_USD</td>
+				<td>@transaction.Blockchain</td>
+				<td>@transaction.From</td>
+				<td>@transaction.Hash</td>
+				<td>@transaction.Symbol</td>
+				<td>@transaction.Timestamp</td>
+				<td>@transaction.To</td>
+				<td>@transaction.Transaction_Count</td>
+				<td>@transaction.Transaction_Type</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+
+@code {
+
+	private string ApiKey = "BMEJgT0Gb3URK2b8pWAbu3cWN1x8jZpr";
+	private string ApiUrl = "https://api.whale-alert.io/v1/transactions";
+
+
+	public WhaleTransactionController whaleTransactionController { get; set; } = new WhaleTransactionController();
+
+
+	public TransactionList GetWhaleTransactions()
+	{
+		httpClient.BaseAddress = new Uri(ApiUrl);
+		var request = new System.Net.Http.HttpRequestMessage();
+		request.Headers.Add("X-WA-API-KEY", ApiKey);
+		request.Headers.Add("Access-Control-Allow-Origin", "*");
+		var response = httpClient.SendAsync(request);
+        response.Wait();
+        var json = new StreamReader(response.Result.Content.ReadAsStreamAsync().Result).ReadToEnd();
+
+
+        return JsonSerializer.Deserialize<TransactionList>(json, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        //var test = JsonConvert.DeserializeObject(json);            
+    }
+}

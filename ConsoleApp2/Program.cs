@@ -19,6 +19,9 @@ namespace ConsoleApp2
                 .Show();
             */
 
+            var test = new WhaleAlertsLibrary.Controllers.CryptoCompareApiController();
+            var symbol_url = test.GetSymbolLogo("BTC");
+
             Console.WriteLine("Hello World!");
         }
     }

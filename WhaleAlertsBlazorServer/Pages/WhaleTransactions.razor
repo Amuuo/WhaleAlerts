@@ -28,7 +28,7 @@
 		{
 			<tr class="d-sm-table-row">
 					
-				<td align="center">@transaction.Symbol.ToUpper()</td>
+				<td align="center"><img height="40px" src="@apiController.GetCoinImageUrl(@transaction.Symbol.ToUpper())"/></td>
 				<td align="right">@transaction.Amount</td>
 				<td align="right"><span class="dollars">@transaction.Amount_USD</span></td>
 				<td align="center">@transaction.Blockchain</td>
@@ -63,7 +63,7 @@
 	private string ApiKey = "BMEJgT0Gb3URK2b8pWAbu3cWN1x8jZpr";
 	private Uri ApiUrl = new Uri("https://api.whale-alert.io/v1/transactions");
 	private TransactionList transactionList { get; set; }
-	
+	private CryptoCompareApiController apiController = new CryptoCompareApiController();
 
 	protected override async Task OnInitializedAsync()
 	{
